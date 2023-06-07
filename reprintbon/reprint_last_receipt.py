@@ -4,8 +4,6 @@ import argparse
 import os
 from dotenv import load_dotenv
 
-
-
 DEFAULT_SERVER_IP = "localhost"
 DEFAULT_NUM_PRINTS = 1
 
@@ -23,26 +21,39 @@ TIMESTAMP = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 # Get the server IP from the environment variable or use the default value
 SERVER_IP = os.getenv("SERVER_IP", DEFAULT_SERVER_IP)
 
+# Check if the README.txt file exists
+if not os.path.isfile("README.txt"):
+    with open("README.txt", "w") as file:
+        file.write("---------------------------------------\n")
+        file.write("APP for triggering printing process:\n")
+        file.write("\n")
+        file.write("This app allows you to trigger the printing process by reprinting the last receipt.\n")
+        file.write("You can specify the number of times to reprint the receipt using command-line arguments or the .env file.\n")
+        file.write("\n")
+
 # Validate the server IP
 try:
     requests.get(f"http://{SERVER_IP}:8001")
+    if DEFAULT_SERVER_IP == True:
+        print(f"Using default server IP: {SERVER_IP}")
 except requests.exceptions.RequestException:
-    print(f"Error: Invalid value for 'SERVER_IP in the .env file': Please provide a correct SERVER_IP addres. ({TIMESTAMP})")
+    print(f"Error: Invalid value for 'SERVER_IP' in the .env file. Please provide a correct SERVER_IP address. ({TIMESTAMP})")
     with open("printing_reports.txt", "a") as file:
-        
-        file.write(f"---------------------------------------\n")
-        file.write(f"Print Error:\n")
-        file.write(f"Error: Invalid value for 'SERVER_IP in the .env file':  Please provide a correct SERVER_IP addres. ({TIMESTAMP})\n")
+        file.write("---------------------------------------\n")
+        file.write("Print Error:\n")
+        file.write(f"Error: Invalid value for 'SERVER_IP' in the .env file. Please provide a correct SERVER_IP address. ({TIMESTAMP})\n")
     exit(-1)
 
 # Get the number of prints from the environment variable or use the default value
 try:
     NUM_PRINTS = int(os.getenv("NUM_PRINTS", DEFAULT_NUM_PRINTS))
+    if NUM_PRINTS < 1:
+        print("Error: Invalid value for 'NUM_PRINTS' in the .env file. Please provide an integer.")
 except ValueError:
     print("Error: Invalid value for 'NUM_PRINTS' in the .env file. Please provide an integer.")
     with open("printing_reports.txt", "a") as file:
         file.write("---------------------------------------\n")
-        file.write(f"Print Error:\n")
+        file.write("Print Error:\n")
         file.write(f"Invalid value for 'NUM_PRINTS' in the .env file. Please provide an integer. ({TIMESTAMP})\n")
     exit(-1)
 
@@ -100,13 +111,11 @@ parser.add_argument(
     help="Number of times to reprint the last receipt (default: value from .env)",
 )
 
-
 # Parse the command-line arguments
 args = parser.parse_args()
 
 # Get the number of prints from the parsed arguments or the .env file
 num_prints = args.num_prints if args.num_prints is not None else NUM_PRINTS
-
 
 # Call the reprint_last_receipt function with the provided number of prints
 try:
