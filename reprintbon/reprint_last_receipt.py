@@ -4,6 +4,8 @@ import argparse
 import os
 from dotenv import load_dotenv
 
+
+
 DEFAULT_SERVER_IP = "localhost"
 DEFAULT_NUM_PRINTS = 1
 
@@ -16,24 +18,44 @@ if not os.path.isfile(".env"):
 
 # Load the environment variables
 load_dotenv()
+TIMESTAMP = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 # Get the server IP from the environment variable or use the default value
 SERVER_IP = os.getenv("SERVER_IP", DEFAULT_SERVER_IP)
 
+# Validate the server IP
+try:
+    requests.get(f"http://{SERVER_IP}:8001")
+except requests.exceptions.RequestException:
+    print(f"Error: Invalid value for 'SERVER_IP in the .env file': Please provide a correct SERVER_IP addres. ({TIMESTAMP})")
+    with open("printing_reports.txt", "a") as file:
+        
+        file.write(f"---------------------------------------\n")
+        file.write(f"Print Error:\n")
+        file.write(f"Error: Invalid value for 'SERVER_IP in the .env file':  Please provide a correct SERVER_IP addres. ({TIMESTAMP})\n")
+    exit(-1)
+
 # Get the number of prints from the environment variable or use the default value
-NUM_PRINTS = int(os.getenv("NUM_PRINTS", DEFAULT_NUM_PRINTS))
+try:
+    NUM_PRINTS = int(os.getenv("NUM_PRINTS", DEFAULT_NUM_PRINTS))
+except ValueError:
+    print("Error: Invalid value for 'NUM_PRINTS' in the .env file. Please provide an integer.")
+    with open("printing_reports.txt", "a") as file:
+        file.write("---------------------------------------\n")
+        file.write(f"Print Error:\n")
+        file.write(f"Invalid value for 'NUM_PRINTS' in the .env file. Please provide an integer. ({TIMESTAMP})\n")
+    exit(-1)
 
 
 def get_last_receipt():
     get_last_receipt_url = f"http://{SERVER_IP}:8001/getLastReceipt"
 
-    # url = os.getenv("LAST_RECEIPT_URL")
     try:
         response = requests.get(get_last_receipt_url)
         if response.status_code == 200:
             receipt_data = response.json()
             receipt_number = receipt_data["receiptItems"][0]["receiptNumber"]
-            return receipt_number  # Return the receipt number
+            return receipt_number
         else:
             print(f"Error: {response.status_code} - {response.reason}")
     except requests.exceptions.RequestException as e:
@@ -43,19 +65,17 @@ def get_last_receipt():
 def reprint_last_receipt(num_prints):
     receipt_number = get_last_receipt()
     reprint_receipt_url = f"http://{SERVER_IP}:8001/ReprintLastReceipt/"
-    # reprint_receipt_url = os.getenv("REPRINT_LAST_RECEIPT_URL")
+
     try:
         with open("printing_reports.txt", "a") as file:
             response_text = ""
             for i in range(num_prints):
                 response = requests.get(reprint_receipt_url)
                 if response.status_code == 200:
-                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    success_message = f"Successful printed Receipt #{receipt_number} at: ({timestamp})"
+                    success_message = f"Successful printed Receipt #{receipt_number} at: ({TIMESTAMP})"
                     response_text += success_message + "\n"
                 else:
-                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    failure_message = f"Print #{i+1}: Failed ({timestamp})"
+                    failure_message = f"Print #{i+1}: Failed ({TIMESTAMP})"
                     response_text += failure_message + "\n"
 
             file.write("---------------------------------------\n")
@@ -80,11 +100,18 @@ parser.add_argument(
     help="Number of times to reprint the last receipt (default: value from .env)",
 )
 
+
 # Parse the command-line arguments
 args = parser.parse_args()
 
-# Get the number of prints from the parsed arguments
-num_prints = args.num_prints
+# Get the number of prints from the parsed arguments or the .env file
+num_prints = args.num_prints if args.num_prints is not None else NUM_PRINTS
+
 
 # Call the reprint_last_receipt function with the provided number of prints
-reprint_last_receipt(num_prints)
+try:
+    reprint_last_receipt(num_prints)
+except ValueError as e:
+    with open("printing_reports.txt", "a") as file:
+        file.write("---------------------------------------\n")
+        file.write(f"Error: {e}\n")

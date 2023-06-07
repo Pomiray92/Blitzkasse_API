@@ -1,3 +1,78 @@
 ---------------------------------------
 1 print(s): Successful
-Successful printed Receipt #7 at: (2023-06-07 12:39:59)
+Successful printed Receipt #7 at: (2023-06-07 15:04:06)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 15:04:38)
+---------------------------------------
+Invalid value for 'NUM_PRINTS' in the .env file. Please provide an integer.
+---------------------------------------
+Invalid value for 'NUM_PRINTS' in the .env file. Please provide an integer.
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 15:16:09)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 15:16:39)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 15:16:47)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 15:16:58)
+---------------------------------------
+Error: Invalid value for 'SERVER_IP': localhwost
+---------------------------------------
+Error: Invalid value for 'SERVER_IP': localhwost. 2023-06-07 15:20:47
+---------------------------------------
+Error: Invalid value for 'SERVER_IP': localhwost. (2023-06-07 15:23:51)
+---------------------------------------
+Invalid value for 'NUM_PRINTS' in the .env file. Please provide an integer. (2023-06-07 15:25:42)
+---------------------------------------
+Error: Invalid value for 'SERVER_IP':  Please provide a correct locaslhost. (2023-06-07 15:26:09)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #376 at: (2023-06-07 15:30:28)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 15:40:29)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 15:41:47)
+---------------------------------------
+Error: Invalid value for 'SERVER_IP':  Please provide a correct SERVER_IP addres. (2023-06-07 15:41:55)
+---------------------------------------
+Error: Invalid value for 'SERVER_IP in the .env file':  Please provide a correct SERVER_IP addres. (2023-06-07 15:42:42)
+---------------------------------------
+Print Error:
+Error: Invalid value for 'SERVER_IP in the .env file':  Please provide a correct SERVER_IP addres. (2023-06-07 15:44:00)
+---------------------------------------
+Print Error:
+Error: Invalid value for 'SERVER_IP in the .env file':  Please provide a correct SERVER_IP addres. (2023-06-07 15:45:21)
+---------------------------------------
+Print Error:
+Error: Invalid value for 'SERVER_IP in the .env file':  Please provide a correct SERVER_IP addres. (2023-06-07 15:46:04)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #376 at: (2023-06-07 15:46:26)
+---------------------------------------
+Print Error:
+Error: Invalid value for 'SERVER_IP in the .env file':  Please provide a correct SERVER_IP addres. (2023-06-07 16:01:11)
+---------------------------------------
+Print Error:
+Error: Invalid value for 'SERVER_IP in the .env file':  Please provide a correct SERVER_IP addres. (2023-06-07 16:01:21)
+---------------------------------------
+Print Error:
+Error: Invalid value for 'SERVER_IP in the .env file':  Please provide a correct SERVER_IP addres. (2023-06-07 16:01:52)
+---------------------------------------
+Print Error:
+Invalid value for 'NUM_PRINTS' in the .env file. Please provide an integer. (2023-06-07 16:02:07)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 16:02:28)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 16:02:42)
+---------------------------------------
+1 print(s): Successful
+Successful printed Receipt #7 at: (2023-06-07 16:04:16)
