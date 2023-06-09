@@ -58,7 +58,7 @@ except ValueError:
     exit(-1)
 
 
-def get_last_receipt():
+def get_last_receipt_number():
     get_last_receipt_url = f"http://{SERVER_IP}:8001/getLastReceipt"
 
     try:
@@ -74,7 +74,7 @@ def get_last_receipt():
 
 
 def reprint_last_receipt(num_prints):
-    receipt_number = get_last_receipt()
+    receipt_number = get_last_receipt_number()
     reprint_receipt_url = f"http://{SERVER_IP}:8001/ReprintLastReceipt/"
 
     try:
