@@ -1,5 +1,5 @@
 import requests
-
+import pdb
 def get_last_receipt():
     last_receipt_url = "http://localhost:8001/getLastReceipt"
     
