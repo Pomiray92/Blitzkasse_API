@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # CONSTANT VARIABLES
-TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+TIMESTAMP = datetime.now().strftime("%Y.%m.%d-%H.%M.%S")
 CURRENT_DATETIME = datetime.now()
 YEAR = CURRENT_DATETIME.year
 MONTH = CURRENT_DATETIME.strftime("%B")
@@ -71,7 +71,7 @@ def get_client_info():
 
 
 def create_pdf():
-    # Call the get_last_receipt() function to retrieve receipt data
+    # Call the get_last_receipt() and get_client_info functions to retrieve receipt data
     receipt_data = get_receipt_info()
     client_data = get_client_info()
     company_name = client_data.get('companyName')
@@ -80,15 +80,26 @@ def create_pdf():
     company_taxId = client_data.get('companyTaxId')
     company_email = client_data.get('companyEmail')
     company_phone = client_data.get('companyPhone')
-    get_table = receipt_data["levelDetailText"]
-    id_receipt = receipt_data["receiptNumber"]
+    get_table = receipt_data.get("levelDetailText")
+    id_receipt = receipt_data.get("receiptNumber")
     receipt_items = receipt_data.get("receiptItems", [])
+    summ = receipt_data.get("summ")
+    paymentMode = receipt_data.get("paymentMode")
+    moneyGiven = receipt_data.get("moneyGiven")
+    returnMoney = receipt_data.get("returnMoney")
+    personnelId = receipt_data.get("personnelId")
+    personnelName = receipt_data.get("personnelName")
+    receiptsSignature = receipt_data.get("receiptsSignature")
 
     if receipt_data is not None and client_data is not None:
         # Create a new PDF instance with custom header and footer
         class MyPDF(FPDF):
-            def __init__(self, company_name, company_address, company_city, company_taxId, company_email,
-                         company_phone, id_receipt, get_table, receipt_items, ):
+            def __init__(
+                    self, company_name, company_address, company_city, company_taxId, company_email,
+                    company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
+                    returnMoney, personnelId, personnelName
+                ):
+
                 super().__init__()
                 self.company_name = company_name
                 self.company_address = company_address
@@ -99,10 +110,17 @@ def create_pdf():
                 self.id_receipt = id_receipt
                 self.get_table = get_table
                 self.receipt_items = receipt_items
+                self.summ = summ
+                self.paymentMode = paymentMode
+                self.moneyGiven = moneyGiven
+                self.returnMoney = returnMoney
+                self.personnelId = personnelId
+                self.personnelIdName = personnelName
+                
 
             def header(self):
                 # Add a custom header to each page
-                self.set_font("Arial", "B", 8)
+                self.set_font("Arial", "B", 12)
                 self.cell(0, 5, self.company_name, 0, 1, "C")
                 self.cell(0, 5, self.company_address, 0, 1, "C")
                 self.cell(0, 5, self.company_city, 0, 1, "C")
@@ -111,11 +129,66 @@ def create_pdf():
                 self.cell(0, 5, self.company_phone, 0, 1, "C")
                 self.cell(0, 5, f"Rechnung: {self.id_receipt}", 0, 1, "C")
                 self.cell(0, 5, f"Tish: {self.get_table}", 0, 1, "C")
-                self.cell(0, 5, "------------------------------", 0, 1, "C")
+                self.cell(0, 5, "--------------------------------------", 0, 1, "C")
+                self.set_font("Arial", "", 12)
+
+                # Create column headers
+                # self.cell(15, 5, "Anzahl", ln=0, align="C")
+                # self.cell(120, 5, "Name", ln=0, align="C")
+                # self.cell(30, 5, "Kosten", ln=1, align="C")
+
                 for item in self.receipt_items:
-                    item_name = f"{item['name']} {item['count']}x {item['price']:.2f}"
-                    self.cell(0, 5, item_name, 0, 1, "C")
-                self.cell(0, 5, "______________________________", 0, 1, "C")
+                    # Get the count, name, and price of the item
+                    item_count = str(item['count'])
+                    item_name = item['name']
+                    item_price = "{:.2f}".format(item['price'])
+
+                    # Calculate the height of the cell based on the content
+                    cell_height = max(self.font_size, 2) * 1.25
+
+                    # Calculate the width of each column
+                    count_width = 15
+                    name_width = 50
+                    price_width = 15
+
+                    # Calculate the remaining width for the item name column
+                    name_remaining_width = self.w - (count_width + name_width + price_width)
+
+                    # Calculate the number of lines needed to display the item name
+                    name_lines = len(item_name.split("\n"))
+
+                    # Calculate the height of the cell based on the number of lines
+                    cell_height = max(cell_height, self.font_size * name_lines)
+
+                   # Calculate the available width for the columns
+                    available_width = self.w - self.l_margin - self.r_margin
+
+                    # Set the position for the count column (10% of available width)
+                    count_x = self.l_margin + (available_width * 0.25)
+                    self.set_x(count_x)
+                    self.cell(count_width, cell_height, item_count, ln=0, align="C")
+
+                    # Set the position for the item name column (40% of available width)
+                    name_x = count_x + (available_width * 0.05)
+                    self.set_x(name_x)
+                    self.cell(name_width, cell_height, item_name, ln=0, align="L")
+
+                    # Set the position for the price column (50% of available width)
+                    price_x = name_x + (available_width * 0.3)
+                    self.set_x(price_x)
+                    self.cell(price_width, cell_height, item_price, ln=1, align="R")
+                
+                self.cell(0, 5, "______________________________________", 0, 1, "C")
+                
+                self.cell(0, 5, f"Zahlart: {self.paymentMode}", 0, 1, "C"),
+                self.cell(0, 5, f"Gezahlt: {self.moneyGiven}", 0, 1, "C"),
+                self.cell(0, 5, f"Rest: {self.returnMoney}", 0, 1, "C"),
+                self.cell(0, 5, f"Datum: {TIMESTAMP}", 0, 1, "C"),
+                self.cell(0, 5, f"Kasse: {self.personnelId}", 0, 1, "C"),
+                self.cell(0, 5, f"Es bedient Sie: {self.personnelIdName}", 0, 1, "C"),
+            
+
+
 
             def footer(self):
                 # Add a custom footer to each page
@@ -123,13 +196,18 @@ def create_pdf():
                 self.set_font("Arial", "I", 8)
                 self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
 
-        pdf = MyPDF(company_name, company_address, company_city, company_taxId, company_email, company_phone,
-                    id_receipt, get_table, receipt_items)
+        pdf = MyPDF(
+                    company_name, company_address, company_city, company_taxId, company_email,
+                    company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
+                    returnMoney, personnelId, personnelName
+                )
         pdf.add_page()
 
         # Set the font and add a header to the PDF
         pdf.set_font("Arial", "B", 14)
-        pdf.cell(0, 10, "Receipt Information", ln=True, align="C")
+        pdf.cell(0, 10, "Vielen Dank", ln=True, align="C")
+        pdf.set_font("Arial", "B", 10)
+        pdf.cell(0, 5, f"TSE Signature: {receiptsSignature}", 0, 1, "C")
 
         # Add spacing after the header
         pdf.ln(10)
