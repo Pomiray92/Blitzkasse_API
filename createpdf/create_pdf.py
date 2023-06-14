@@ -42,7 +42,6 @@ except requests.exceptions.RequestException:
     print(f"Error: Invalid value for 'SERVER_IP' in the .env file. Please provide a correct SERVER_IP address. ({TIMESTAMP})")
     exit(1)
 
-
 def get_receipt_info():
     try:
         response = requests.get(LAST_RECEIPT_URL)
@@ -53,7 +52,6 @@ def get_receipt_info():
             print(f"Error: {response.status_code} - {response.reason}")
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
-
 
 def get_client_info():
     try:
@@ -90,6 +88,7 @@ def create_pdf():
     personnelId = receipt_data.get("personnelId")
     personnelName = receipt_data.get("personnelName")
     receiptsSignature = receipt_data.get("receiptsSignature")
+    taxProducts = receipt_data.get("taxProducts")
 
     if receipt_data is not None and client_data is not None:
         # Create a new PDF instance with custom header and footer
@@ -97,7 +96,7 @@ def create_pdf():
             def __init__(
                     self, company_name, company_address, company_city, company_taxId, company_email,
                     company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
-                    returnMoney, personnelId, personnelName
+                    returnMoney, personnelId, personnelName, taxProducts
                 ):
 
                 super().__init__()
@@ -116,6 +115,7 @@ def create_pdf():
                 self.returnMoney = returnMoney
                 self.personnelId = personnelId
                 self.personnelIdName = personnelName
+                self.taxProducts = taxProducts
                 
 
             def header(self):
@@ -129,13 +129,9 @@ def create_pdf():
                 self.cell(0, 5, self.company_phone, 0, 1, "C")
                 self.cell(0, 5, f"Rechnung: {self.id_receipt}", 0, 1, "C")
                 self.cell(0, 5, f"Tish: {self.get_table}", 0, 1, "C")
-                self.cell(0, 5, "--------------------------------------", 0, 1, "C")
+                
                 self.set_font("Arial", "", 12)
-
-                # Create column headers
-                # self.cell(15, 5, "Anzahl", ln=0, align="C")
-                # self.cell(120, 5, "Name", ln=0, align="C")
-                # self.cell(30, 5, "Kosten", ln=1, align="C")
+                self.cell(0, 5, "______________________________________", 0, 1, "C")
 
                 for item in self.receipt_items:
                     # Get the count, name, and price of the item
@@ -179,14 +175,44 @@ def create_pdf():
                     self.cell(price_width, cell_height, item_price, ln=1, align="R")
                 
                 self.cell(0, 5, "______________________________________", 0, 1, "C")
+                self.cell(0, 5, "====================================", 0, 1, "C")
+
+                # for item in self.taxProducts:
+
+
+                # tax_lebels = ["MwSt.", "%", "Brutto", "Netto", "Steuer"]
+                # tax_a = ["A"]
+
+                self.cell(0, 5, f"MwSt.")
+
+                self.cell(0, 5, "______________________________________", 0, 1, "C")
+                self.cell(0, 5, "====================================", 0, 1, "C")
                 
-                self.cell(0, 5, f"Zahlart: {self.paymentMode}", 0, 1, "C"),
-                self.cell(0, 5, f"Gezahlt: {self.moneyGiven}", 0, 1, "C"),
-                self.cell(0, 5, f"Rest: {self.returnMoney}", 0, 1, "C"),
-                self.cell(0, 5, f"Datum: {TIMESTAMP}", 0, 1, "C"),
-                self.cell(0, 5, f"Kasse: {self.personnelId}", 0, 1, "C"),
-                self.cell(0, 5, f"Es bedient Sie: {self.personnelIdName}", 0, 1, "C"),
-            
+                
+                # Set the left and right margins as percentages of the page width
+                l_margin_percent = 10  # Adjust the left margin percentage as needed
+                r_margin_percent = 90  # Adjust the right margin percentage as needed
+                page_width = self.w - self.l_margin - self.r_margin
+                l_margin = (page_width * l_margin_percent) / 100
+                r_margin = (page_width * r_margin_percent) / 100
+
+                # Define the labels and data as lists
+                labels = ["Zahlart:", "Gezahlt:", "Rest:", "Datum:", "Kasse:", "Es bedient Sie:"]
+                data = [self.paymentMode, self.moneyGiven, self.returnMoney, TIMESTAMP, self.personnelId, self.personnelIdName]
+
+                # Set the position for the labels and data columns
+                self.set_font('Arial', 'B', 10)  # Adjust the font and size as needed
+                column_width = page_width * 0.43
+                label_x = l_margin
+                data_x = l_margin + column_width + 5  # Adjust the spacing between columns as needed
+
+                for i in range(len(labels)):
+                    self.set_x(label_x)
+                    self.cell(column_width, 5, labels[i], 0, 0, "R")
+                    
+                    self.set_x(data_x)
+                    self.cell(column_width, 5, str(data[i]), 0, 1, "L")
+                            
 
 
 
@@ -199,7 +225,7 @@ def create_pdf():
         pdf = MyPDF(
                     company_name, company_address, company_city, company_taxId, company_email,
                     company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
-                    returnMoney, personnelId, personnelName
+                    returnMoney, personnelId, personnelName, taxProducts
                 )
         pdf.add_page()
 
@@ -230,5 +256,4 @@ def create_pdf():
     else:
         print("Error: Failed to retrieve receipt information.")
 
-# Call the create_pdf() function to generate the PDF
 create_pdf()

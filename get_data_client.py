@@ -61,19 +61,10 @@ def get_last_receipt():
                     cost = float(existing_item.split(" ")[-1].replace(",", ".")) + (item["count"] * item["price"])
                     category_names[existing_item_index] = f"{item['name']} {quantity}x {cost:.2f}"
             
-            # key_list = []
-            # for dict in receipt_data["taxProducts"]:
-            #     for key, value in dict.items():
-                    
-            #         if key == "name":
-            #             key_list.append(value)
-            #             print(key)
-                    
-            #     print(dict)
-            # pdb.set_trace()
+            
 
 
-            print(category_names)
+            #print(category_names)
             # Store the receipt data as per your requirements
             # Example: save it to a file, database, or variable
             # ...
@@ -86,6 +77,29 @@ def get_last_receipt():
             print("Payment Order Number:", paymentOrderNumber)
             print("Receipt Number:", receipt_number)
             print("-----------------------------\n")
+
+
+            get_taxProducts = receipt_data["taxProducts"]
+            #print(get_taxProducts)
+            
+            for tax_product in get_taxProducts:
+                if tax_product["totalBrutto"] != 0:
+                    # Store the information
+                    total_brutto = tax_product["totalBrutto"]
+                    total_netto = tax_product["totalNetto"]
+                    total_absolute_tax = tax_product["totalAbsoluteTax"]
+                    
+                    # Perform further processing or store the data as needed
+                    print(f"Total Brutto: {total_brutto}")
+                    print(f"Total Netto: {total_netto}")
+                    print(f"Total Absolute Tax: {total_absolute_tax}")
+                else:
+                    # Skip to the next item
+                    continue
+
+
+
+
             #print("Last receipt data:", receipt_data)
             return receipt_data  # Return the receipt data
         else:
