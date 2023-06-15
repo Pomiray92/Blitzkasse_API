@@ -108,7 +108,7 @@ def create_pdf():
 
             if tax_value == 19:
                 tax_name_a.append({
-                    " ": name_and_tax,
+                    "MwSt.": name_and_tax,
                     "Brutto": total_brutto,
                     "Netto": total_netto,
                     "Steuer": total_absolute_tax
@@ -130,6 +130,13 @@ def create_pdf():
         else:
             # Skip to the next item
             continue
+
+        # if len(self.tax_name_a) != 0:
+        #     self.cell(150, 5, f"{tax_name_a}", 0, 1, "C")
+        #     if len(self.tax_name_b)!= 0:
+        #         self.cell(150, 5, f"{tax_name_b}", 0, 1, "C")
+        #     if len(self.tax_name_c)!= 0:
+        #         self.cell(150, 5, f"{tax_name_c}", 0, 1, "C")
     
     
 
@@ -224,16 +231,46 @@ def create_pdf():
                 self.cell(0, 5, "====================================", 0, 1, "C")
 
                 
-                if len(self.tax_name_a) != 0:
-                    self.cell(150, 5, f"{tax_name_a}", 0, 1, "C")
-                    if len(self.tax_name_b)!= 0:
-                        self.cell(150, 5, f"{tax_name_b}", 0, 1, "C")
-                    if len(self.tax_name_c)!= 0:
-                        self.cell(150, 5, f"{tax_name_c}", 0, 1, "C")
+                
+                
+                # Set the column widths
+                col_widths = [20, 20, 20, 20]
+
+                # Set the data for the table
+                header_row = ["MwSt.", "Brutto", "Netto", "Steuer"]
+                data_rows = [
+                    [name_and_tax, total_brutto, total_netto, total_absolute_tax],
+                    # Add more data rows here if needed
+                ]
+
+                # Set the alignment for each column
+                alignments = ["C", "C", "C", "C"]
+                offset = 50
+                # Calculate the x-coordinate to move the items to the right
+                x = self.get_x() + offset
+
+                # Draw the header row
+                self.set_x(x)
+
+                # Draw the header row
+                for i, header_cell in enumerate(header_row):
+                    self.cell(col_widths[i], 10, header_cell, 0, 0, "C")
+
+                self.ln(10)  # Move to the next line
+
+                self.set_x(x)
+                # Draw the data rows
+                for data_row in data_rows:
+                    for i, data_cell in enumerate(data_row):
+                        self.cell(col_widths[i], 10, str(data_cell), 0, 0, alignments[i])
+
+                    self.ln(10)  # Move to the next line
                     
 
                 self.cell(0, 5, "______________________________________", 0, 1, "C")
-                self.cell(0, 5, str(self.summ), 0, 1, "C")
+                self.set_font("Arial", "B", 10)
+                self.cell(0, 5, f"GESAMT: {str(self.summ)}", 0, 1, "C")
+                self.set_font("Arial", "", 12)
                 self.cell(0, 5, "====================================", 0, 1, "C")
                 
                 
