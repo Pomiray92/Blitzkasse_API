@@ -18,14 +18,14 @@ def get_client_info():
             companyEmail = receipt_data['companyEmail']
             companyPhone = receipt_data['companyPhone']
 
-            print("-----------------------------\n")
-            print(f"COMPANY NAME:  {companyName}")
-            print(f"COMPANY ADDRESS:  {companyAddress}")
-            print(f"COMPANY CITY:  {companyCity}")
-            print(f"COMPANY PHONE:  {companyPhone}")
-            print(f"COMPANY TAX ID:  {companyTaxId}")
-            print(f"COMPANY EMAIL:  {companyEmail}")
-            print("-----------------------------\n")
+            # print("-----------------------------\n")
+            # print(f"COMPANY NAME:  {companyName}")
+            # print(f"COMPANY ADDRESS:  {companyAddress}")
+            # print(f"COMPANY CITY:  {companyCity}")
+            # print(f"COMPANY PHONE:  {companyPhone}")
+            # print(f"COMPANY TAX ID:  {companyTaxId}")
+            # print(f"COMPANY EMAIL:  {companyEmail}")
+            # print("-----------------------------\n")
             return receipt_data  # Return the receipt data
         else:
             print(f"Error: {response.status_code} - {response.reason}")
@@ -46,7 +46,7 @@ def get_last_receipt():
             receipt_data = response.json()
             
             get_table = receipt_data["levelDetailText"]
-            print(get_table)
+            # print(get_table)
 
             category_names = []
             for item in receipt_data["receiptItems"]:
@@ -73,32 +73,61 @@ def get_last_receipt():
             paymentOrderNumber = receipt_data['receiptItems'][0]['paymentOrderNumber']
             userName = receipt_data['receiptItems'][0]['userName']
 
-            print("User Name:", userName)
-            print("Payment Order Number:", paymentOrderNumber)
-            print("Receipt Number:", receipt_number)
-            print("-----------------------------\n")
+            # print("User Name:", userName)
+            # print("Payment Order Number:", paymentOrderNumber)
+            # print("Receipt Number:", receipt_number)
+            # print("-----------------------------\n")
 
 
             get_taxProducts = receipt_data["taxProducts"]
-            #print(get_taxProducts)
-            
+
+            tax_name_a = []
+            tax_name_b = []
+            tax_name_c = []
+
             for tax_product in get_taxProducts:
                 if tax_product["totalBrutto"] != 0:
-                    # Store the information
+                    # Store the information in separate lists based on taxValue
+                    tax_value = tax_product["taxValue"]
                     total_brutto = tax_product["totalBrutto"]
                     total_netto = tax_product["totalNetto"]
                     total_absolute_tax = tax_product["totalAbsoluteTax"]
-                    
+                    name = tax_product["name"]
+                    name_and_tax = f"{name} {tax_value}%"
+                    if tax_value == 19:
+                        tax_name_a.append({
+                            " ": name_and_tax, 
+                            "total_brutto": total_brutto,
+                            "total_netto": total_netto,
+                            "total_absolute_tax": total_absolute_tax
+                        })
+                    elif tax_value == 7:
+                        tax_name_b.append({
+                            " ": name_and_tax,
+                            "total_brutto": total_brutto,
+                            "total_netto": total_netto,
+                            "total_absolute_tax": total_absolute_tax
+                        })
+                    elif tax_value == 0:
+                        tax_name_c.append({
+                            " ": name_and_tax,
+                            "total_brutto": total_brutto,
+                            "total_netto": total_netto,
+                            "total_absolute_tax": total_absolute_tax
+                        })
+
                     # Perform further processing or store the data as needed
+                    print(f"Tax Value: {tax_value}")
                     print(f"Total Brutto: {total_brutto}")
                     print(f"Total Netto: {total_netto}")
                     print(f"Total Absolute Tax: {total_absolute_tax}")
                 else:
                     # Skip to the next item
                     continue
-
-
-
+            
+            print(tax_name_a)
+            print(tax_name_b)
+            print(tax_name_c)
 
             #print("Last receipt data:", receipt_data)
             return receipt_data  # Return the receipt data

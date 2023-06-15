@@ -90,13 +90,56 @@ def create_pdf():
     receiptsSignature = receipt_data.get("receiptsSignature")
     taxProducts = receipt_data.get("taxProducts")
 
+    get_taxProducts = receipt_data["taxProducts"]
+
+    tax_name_a = []
+    tax_name_b = []
+    tax_name_c = []
+
+    for tax_product in get_taxProducts:
+        if tax_product["totalBrutto"] != 0:
+            # Store the information in separate lists based on taxValue
+            tax_value = tax_product["taxValue"]
+            total_brutto = tax_product["totalBrutto"]
+            total_netto = tax_product["totalNetto"]
+            total_absolute_tax = tax_product["totalAbsoluteTax"]
+            name = tax_product["name"]
+            name_and_tax = f"{name}= {tax_value}%"
+
+            if tax_value == 19:
+                tax_name_a.append({
+                    " ": name_and_tax,
+                    "Brutto": total_brutto,
+                    "Netto": total_netto,
+                    "Steuer": total_absolute_tax
+                })
+            elif tax_value == 7:
+                tax_name_b.append({
+                    " ": name_and_tax,
+                    "Brutto": total_brutto,
+                    "Netto": total_netto,
+                    "Steuer": total_absolute_tax
+                })
+            elif tax_value == 0:
+                tax_name_c.append({
+                    " ": name_and_tax,
+                    "Brutto": total_brutto,
+                    "Netto": total_netto,
+                    "Steuer": total_absolute_tax
+                })
+        else:
+            # Skip to the next item
+            continue
+    
+    
+
     if receipt_data is not None and client_data is not None:
         # Create a new PDF instance with custom header and footer
         class MyPDF(FPDF):
             def __init__(
                     self, company_name, company_address, company_city, company_taxId, company_email,
                     company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
-                    returnMoney, personnelId, personnelName, taxProducts
+                    returnMoney, personnelId, personnelName, taxProducts, tax_name_a, tax_name_b, tax_name_c,
                 ):
 
                 super().__init__()
@@ -116,7 +159,9 @@ def create_pdf():
                 self.personnelId = personnelId
                 self.personnelIdName = personnelName
                 self.taxProducts = taxProducts
-                
+                self.tax_name_a = tax_name_a
+                self.tax_name_b = tax_name_b
+                self.tax_name_c = tax_name_c
 
             def header(self):
                 # Add a custom header to each page
@@ -175,17 +220,20 @@ def create_pdf():
                     self.cell(price_width, cell_height, item_price, ln=1, align="R")
                 
                 self.cell(0, 5, "______________________________________", 0, 1, "C")
+                
                 self.cell(0, 5, "====================================", 0, 1, "C")
 
-                # for item in self.taxProducts:
-
-
-                # tax_lebels = ["MwSt.", "%", "Brutto", "Netto", "Steuer"]
-                # tax_a = ["A"]
-
-                self.cell(0, 5, f"MwSt.")
+                
+                if len(self.tax_name_a) != 0:
+                    self.cell(150, 5, f"{tax_name_a}", 0, 1, "C")
+                    if len(self.tax_name_b)!= 0:
+                        self.cell(150, 5, f"{tax_name_b}", 0, 1, "C")
+                    if len(self.tax_name_c)!= 0:
+                        self.cell(150, 5, f"{tax_name_c}", 0, 1, "C")
+                    
 
                 self.cell(0, 5, "______________________________________", 0, 1, "C")
+                self.cell(0, 5, str(self.summ), 0, 1, "C")
                 self.cell(0, 5, "====================================", 0, 1, "C")
                 
                 
@@ -213,9 +261,6 @@ def create_pdf():
                     self.set_x(data_x)
                     self.cell(column_width, 5, str(data[i]), 0, 1, "L")
                             
-
-
-
             def footer(self):
                 # Add a custom footer to each page
                 self.set_y(-15)
@@ -225,7 +270,7 @@ def create_pdf():
         pdf = MyPDF(
                     company_name, company_address, company_city, company_taxId, company_email,
                     company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
-                    returnMoney, personnelId, personnelName, taxProducts
+                    returnMoney, personnelId, personnelName, taxProducts, tax_name_a, tax_name_b, tax_name_c
                 )
         pdf.add_page()
 
