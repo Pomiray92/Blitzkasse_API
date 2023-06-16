@@ -6,56 +6,8 @@ from dotenv import load_dotenv
 from create_functions import *
 load_dotenv()
 
-# CONSTANT VARIABLES
-TIMESTAMP = datetime.now().strftime("%d.%m.%Y-%H:%M")
-CURRENT_DATETIME = datetime.now()
-YEAR = CURRENT_DATETIME.year
-MONTH = CURRENT_DATETIME.strftime("%B")
-DAY = CURRENT_DATETIME.day
-
-
 SERVER_IP = os.getenv("SERVER_IP", DEFAULT_SERVER_IP)
 LAST_RECEIPT_URL = f"http://{SERVER_IP}:8001/getLastReceipt"
-CLIENT_INFO_URL = f"http://{SERVER_IP}:8001/ConfigComplete"
-
-
-
-create_default_readme_file()
-
-# Validate the server IP
-try:
-    requests.get(f"http://{SERVER_IP}:8001")
-    if DEFAULT_SERVER_IP == True:
-        print(f"Using default server IP: {SERVER_IP}")
-except requests.exceptions.RequestException:
-    print(f"Error: Invalid value for 'SERVER_IP' in the .env file. Please provide a correct SERVER_IP address. ({TIMESTAMP})")
-    exit(1)
-
-def get_receipt_info():
-    try:
-        response = requests.get(LAST_RECEIPT_URL)
-        if response.status_code == 200:
-            receipt_data = response.json()
-            return receipt_data  # Return the receipt data
-        else:
-            print(f"Error: {response.status_code} - {response.reason}")
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
-
-def get_client_info():
-    try:
-        response_client_info = requests.get(CLIENT_INFO_URL)
-        if response_client_info.status_code == 200:
-            # Assuming the response is in JSON format
-            client_info = response_client_info.json()
-            return client_info
-        else:
-            print("Error: Failed to retrieve receipt information. Status code:", response_client_info.status_code)
-    except requests.exceptions.RequestException as e:
-        print("Error: Failed to connect to the server:", e)
-
-    return response_client_info
-
 
 def create_pdf():
     # Call the get_last_receipt() and get_client_info functions to retrieve receipt data
@@ -361,3 +313,4 @@ def create_pdf():
         print("Error: Failed to retrieve receipt information.")
 
 create_pdf()
+create_default_readme_file()
