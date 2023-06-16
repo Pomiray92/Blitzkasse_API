@@ -1,37 +1,26 @@
 from fpdf import FPDF
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
-
+from create_functions import *
 load_dotenv()
 
 # CONSTANT VARIABLES
-TIMESTAMP = datetime.now().strftime("%Y.%m.%d-%H.%M.%S")
+TIMESTAMP = datetime.now().strftime("%d.%m.%Y-%H:%M")
 CURRENT_DATETIME = datetime.now()
 YEAR = CURRENT_DATETIME.year
 MONTH = CURRENT_DATETIME.strftime("%B")
 DAY = CURRENT_DATETIME.day
-DEFAULT_SERVER_IP = "localhost"
 
-# Create a default settings.env file
-if not os.path.isfile("settings.env"):
-    with open("settings.env", "w") as env_file:
-        env_file.write(f"SERVER_IP={DEFAULT_SERVER_IP}\n")
 
 SERVER_IP = os.getenv("SERVER_IP", DEFAULT_SERVER_IP)
 LAST_RECEIPT_URL = f"http://{SERVER_IP}:8001/getLastReceipt"
 CLIENT_INFO_URL = f"http://{SERVER_IP}:8001/ConfigComplete"
 
-# Create a default README.txt file
-if not os.path.isfile("README.txt"):
-    with open("README.txt", "w") as file:
-        file.write("---------------------------------------\n")
-        file.write("APP for creating pdf from retrieve receipt Information:\n")
-        file.write("\n")
-        file.write("This app allows you to create a PDF from retrieve receipt data, store it or send via email.\n")
-        file.write(".\n")
-        file.write("\n")
+
+
+create_default_readme_file()
 
 # Validate the server IP
 try:
@@ -89,8 +78,18 @@ def create_pdf():
     personnelName = receipt_data.get("personnelName")
     receiptsSignature = receipt_data.get("receiptsSignature")
     taxProducts = receipt_data.get("taxProducts")
-
+    transaction_data = receipt_data.get("transactionData")
     get_taxProducts = receipt_data["taxProducts"]
+    secure_element_serial = receipt_data.get("secureElementSerial")
+    secure_element_start_time = receipt_data.get("secureElementStartTime")
+    secure_element_end_time = receipt_data.get("secureElementEndTime")
+    cecure_element_client = receipt_data.get("secureElementClient")
+    secure_element_log_time = receipt_data.get("secureElementLogTime")
+    secure_element_public_key = receipt_data.get("secureElementPublicKey")
+    secure_element_algorithm = receipt_data.get("secureElementAlgorithm")
+
+    if transaction_data == None:
+        transaction_data = "0"
 
     tax_name_a = []
     tax_name_b = []
@@ -147,6 +146,8 @@ def create_pdf():
                     self, company_name, company_address, company_city, company_taxId, company_email,
                     company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
                     returnMoney, personnelId, personnelName, taxProducts, tax_name_a, tax_name_b, tax_name_c,
+                    transaction_data, secure_element_serial, secure_element_start_time, secure_element_end_time,
+                    cecure_element_client, secure_element_log_time, secure_element_public_key, secure_element_algorithm
                 ):
 
                 super().__init__()
@@ -169,6 +170,14 @@ def create_pdf():
                 self.tax_name_a = tax_name_a
                 self.tax_name_b = tax_name_b
                 self.tax_name_c = tax_name_c
+                self.transaction_data = transaction_data
+                self.secure_element_serial = secure_element_serial
+                self.secure_element_start_time = secure_element_start_time
+                self.secure_element_end_time = secure_element_end_time
+                self.cecure_element_client = cecure_element_client
+                self.secure_element_log_time = secure_element_log_time
+                self.secure_element_public_key = secure_element_public_key
+                self.secure_element_algorithm = secure_element_algorithm
 
             def header(self):
                 # Add a custom header to each page
@@ -239,13 +248,13 @@ def create_pdf():
                 # Set the data for the table
                 header_row = ["MwSt.", "Brutto", "Netto", "Steuer"]
                 data_rows = [
-                    [name_and_tax, total_brutto, total_netto, total_absolute_tax],
-                    # Add more data rows here if needed
+                    [name_and_tax, "{:.2f}".format(total_brutto), "{:.2f}".format(total_netto), "{:.2f}".format(total_absolute_tax)],
                 ]
 
                 # Set the alignment for each column
                 alignments = ["C", "C", "C", "C"]
                 offset = 50
+
                 # Calculate the x-coordinate to move the items to the right
                 x = self.get_x() + offset
 
@@ -282,7 +291,7 @@ def create_pdf():
                 r_margin = (page_width * r_margin_percent) / 100
 
                 # Define the labels and data as lists
-                labels = ["Zahlart:", "Gezahlt:", "Rest:", "Datum:", "Kasse:", "Es bedient Sie:"]
+                labels = ["Zahlart:", "Gezahlt:", "Rückgabe:", "Datum:", "Kasse:", "Es bedient Sie:"]
                 data = [self.paymentMode, self.moneyGiven, self.returnMoney, TIMESTAMP, self.personnelId, self.personnelIdName]
 
                 # Set the position for the labels and data columns
@@ -307,16 +316,29 @@ def create_pdf():
         pdf = MyPDF(
                     company_name, company_address, company_city, company_taxId, company_email,
                     company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
-                    returnMoney, personnelId, personnelName, taxProducts, tax_name_a, tax_name_b, tax_name_c
+                    returnMoney, personnelId, personnelName, taxProducts, tax_name_a, tax_name_b, tax_name_c,
+                    transaction_data, secure_element_serial, secure_element_start_time, secure_element_end_time,
+                    cecure_element_client, secure_element_log_time, secure_element_public_key, secure_element_algorithm
                 )
         pdf.add_page()
+    
+
+        start_time = datetime.now()
+        stop_time = start_time + timedelta(seconds=2)
 
         # Set the font and add a header to the PDF
         pdf.set_font("Arial", "B", 14)
         pdf.cell(0, 10, "Vielen Dank", ln=True, align="C")
         pdf.set_font("Arial", "B", 10)
         pdf.cell(0, 5, f"TSE Signature: {receiptsSignature}", 0, 1, "C")
-
+        pdf.cell(0, 5, f"TSE Transaktion: {transaction_data}", 0, 1, "C")
+        pdf.cell(0, 5, f"TSE Start: {start_time.strftime('%d.%m.%Y-%H:%M:%S')}", 0, 1, "C")
+        pdf.cell(0, 5, f"TSE Stop:  {stop_time.strftime('%d.%m.%Y-%H:%M:%S')}", 0, 1, "C")
+        pdf.cell(0, 5, f"TSE Serialnummer: {secure_element_serial}", 0, 1, "C")
+        pdf.cell(0, 5, f"TSE Sigantureaccount: {cecure_element_client}", 0, 1, "C")
+        pdf.cell(0, 5, f"TSE Zeitformat: {secure_element_log_time}", 0, 1, "C")
+        pdf.cell(0, 5, f"TSE Publickey: {secure_element_public_key}", 0, 1, "C")
+        pdf.cell(0, 5, f"TSE HashAlgorithm: {secure_element_algorithm}", 0, 1, "C")
         # Add spacing after the header
         pdf.ln(10)
 
@@ -330,7 +352,7 @@ def create_pdf():
         os.makedirs(directory_path, exist_ok=True)
 
         # Save the PDF file with the current datetime in the filename and store it in the year folder
-        file_path = os.path.join(directory_path, f"receipt{TIMESTAMP}.pdf")
+        file_path = os.path.join(directory_path, f"receipt{datetime.now().strftime('%d.%m.%Y-%H_%M_%S')}.pdf")
 
         # Output the PDF
         pdf.output(file_path)
