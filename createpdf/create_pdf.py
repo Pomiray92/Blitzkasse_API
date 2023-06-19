@@ -40,56 +40,27 @@ def create_pdf():
     secure_element_public_key = receipt_data.get("secureElementPublicKey")
     secure_element_algorithm = receipt_data.get("secureElementAlgorithm")
 
-    if transaction_data == None:
-        transaction_data = "0"
 
-    tax_name_a = []
-    tax_name_b = []
-    tax_name_c = []
-
-    for tax_product in get_taxProducts:
-        if tax_product["totalBrutto"] != 0:
-            # Store the information in separate lists based on taxValue
-            tax_value = tax_product["taxValue"]
+    tax_data = {}
+    if isinstance(get_taxProducts, list):
+        for tax_product in get_taxProducts:
             total_brutto = tax_product["totalBrutto"]
-            total_netto = tax_product["totalNetto"]
-            total_absolute_tax = tax_product["totalAbsoluteTax"]
-            name = tax_product["name"]
-            name_and_tax = f"{name}= {tax_value}%"
+            if total_brutto != 0:
+                total_netto = tax_product["totalNetto"]
+                total_absolute_tax = tax_product["totalAbsoluteTax"]
+                name = tax_product["name"]
+                tax_value = tax_product["taxValue"]
+                name_and_tax = f"{name}= {tax_value}%"
 
-            if tax_value == 19:
-                tax_name_a.append({
+                tax_data[name] = {
                     "MwSt.": name_and_tax,
                     "Brutto": total_brutto,
                     "Netto": total_netto,
                     "Steuer": total_absolute_tax
-                })
-            elif tax_value == 7:
-                tax_name_b.append({
-                    " ": name_and_tax,
-                    "Brutto": total_brutto,
-                    "Netto": total_netto,
-                    "Steuer": total_absolute_tax
-                })
-            elif tax_value == 0:
-                tax_name_c.append({
-                    " ": name_and_tax,
-                    "Brutto": total_brutto,
-                    "Netto": total_netto,
-                    "Steuer": total_absolute_tax
-                })
-        else:
-            # Skip to the next item
-            continue
-
-        # if len(self.tax_name_a) != 0:
-        #     self.cell(150, 5, f"{tax_name_a}", 0, 1, "C")
-        #     if len(self.tax_name_b)!= 0:
-        #         self.cell(150, 5, f"{tax_name_b}", 0, 1, "C")
-        #     if len(self.tax_name_c)!= 0:
-        #         self.cell(150, 5, f"{tax_name_c}", 0, 1, "C")
-    
-    
+                }
+    else:
+        print("Error: get_taxProducts is not a list")
+    print(tax_data)
 
     if receipt_data is not None and client_data is not None:
         # Create a new PDF instance with custom header and footer
@@ -97,7 +68,7 @@ def create_pdf():
             def __init__(
                     self, company_name, company_address, company_city, company_taxId, company_email,
                     company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
-                    returnMoney, personnelId, personnelName, taxProducts, tax_name_a, tax_name_b, tax_name_c,
+                    returnMoney, personnelId, personnelName, taxProducts,
                     transaction_data, secure_element_serial, secure_element_start_time, secure_element_end_time,
                     cecure_element_client, secure_element_log_time, secure_element_public_key, secure_element_algorithm
                 ):
@@ -119,9 +90,6 @@ def create_pdf():
                 self.personnelId = personnelId
                 self.personnelIdName = personnelName
                 self.taxProducts = taxProducts
-                self.tax_name_a = tax_name_a
-                self.tax_name_b = tax_name_b
-                self.tax_name_c = tax_name_c
                 self.transaction_data = transaction_data
                 self.secure_element_serial = secure_element_serial
                 self.secure_element_start_time = secure_element_start_time
@@ -192,35 +160,38 @@ def create_pdf():
                 self.cell(0, 5, "====================================", 0, 1, "C")
 
                 
-                
-                
                 # Set the column widths
                 col_widths = [20, 20, 20, 20]
 
                 # Set the data for the table
                 header_row = ["MwSt.", "Brutto", "Netto", "Steuer"]
-                data_rows = [
-                    [name_and_tax, "{:.2f}".format(total_brutto), "{:.2f}".format(total_netto), "{:.2f}".format(total_absolute_tax)],
-                ]
+                data_rows = []
+
+                # Iterate over the tax_data dictionary
+                for tax_name, tax_info in tax_data.items():
+                    name_and_tax = tax_info["MwSt."]
+                    total_brutto = tax_info["Brutto"]
+                    total_netto = tax_info["Netto"]
+                    total_absolute_tax = tax_info["Steuer"]
+                    data_row = [name_and_tax, "{:.2f}".format(total_brutto), "{:.2f}".format(total_netto), "{:.2f}".format(total_absolute_tax)]
+                    data_rows.append(data_row)
 
                 # Set the alignment for each column
                 alignments = ["C", "C", "C", "C"]
-                offset = 50
+                offset = 50    
 
                 # Calculate the x-coordinate to move the items to the right
                 x = self.get_x() + offset
 
                 # Draw the header row
                 self.set_x(x)
-
-                # Draw the header row
                 for i, header_cell in enumerate(header_row):
                     self.cell(col_widths[i], 10, header_cell, 0, 0, "C")
 
                 self.ln(10)  # Move to the next line
 
-                self.set_x(x)
                 # Draw the data rows
+                self.set_x(x)
                 for data_row in data_rows:
                     for i, data_cell in enumerate(data_row):
                         self.cell(col_widths[i], 10, str(data_cell), 0, 0, alignments[i])
@@ -268,7 +239,7 @@ def create_pdf():
         pdf = MyPDF(
                     company_name, company_address, company_city, company_taxId, company_email,
                     company_phone, id_receipt, get_table, receipt_items, summ, paymentMode, moneyGiven,
-                    returnMoney, personnelId, personnelName, taxProducts, tax_name_a, tax_name_b, tax_name_c,
+                    returnMoney, personnelId, personnelName, taxProducts,
                     transaction_data, secure_element_serial, secure_element_start_time, secure_element_end_time,
                     cecure_element_client, secure_element_log_time, secure_element_public_key, secure_element_algorithm
                 )
