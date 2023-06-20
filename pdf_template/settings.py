@@ -11,7 +11,6 @@ def create_settings_env_file():
         with open("settings.env", "w") as env_file:
             env_file.write(f"SERVER_IP={DEFAULT_SERVER_IP}\n")
 
-create_settings_env_file()
 
 def create_default_readme_file():
     if not os.path.isfile("README.txt"):
@@ -22,5 +21,3 @@ def create_default_readme_file():
             file.write("This app allows you to create a PDF from retrieve receipt data, store it or send via email.\n")
             file.write(".\n")
             file.write("\n")
-
-create_default_readme_file()
