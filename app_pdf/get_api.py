@@ -2,6 +2,7 @@ import requests
 from get_api import *
 from settings import *
 from datetime import datetime, timedelta
+import pdb
 
 # CONSTANT VARIABLES
 DEFAULT_SERVER_IP = "localhost"
@@ -91,23 +92,32 @@ data_dict = {
 }
 
 consolidated_items = {}
-    
-    # Calculate the quantities and prices for the consolidated items
+
+consolidated_items = {}
+
 for item in data_dict['receiptItems']:
+    item_id = item["productId"]
     item_name = item['name']
     item_price = item['price']
     item_count = item['count']
     item_total_price = item_price * item_count
 
-    if item_name in consolidated_items:
-        consolidated_items[item_name]['count'] += item_count
-        consolidated_items[item_name]['price'] += item_total_price
+    if item_id in consolidated_items:
+        consolidated_items[item_id]['count'] += item_count
+        consolidated_items[item_id]['price'] += item_total_price
     else:
-        consolidated_items[item_name] = {'count': item_count, 'price': item_total_price}
+        consolidated_items[item_id] = {'count': item_count, 'price': item_total_price, 'name': item_name}
+
+# Display the consolidated items
+for item_id, item_data in consolidated_items.items():
+    item_name = item_data['name']
+    item_count = item_data['count']
+    item_total_price = item_data['price']
+    item_price = item_total_price / item_count
 
 # Update the data_dict with consolidated items
 data_dict['consolidatedItems'] = consolidated_items
-
+#breakpoint()
 # Format the prices with commas and two decimal places for each item
 for item_data in consolidated_items.values():
     item_data['formatted_price'] = '{:,.2f}'.format(item_data['price'] / item_data['count'])
@@ -123,5 +133,3 @@ formatted_total_price = '{:,.2f}'.format(total_price)
 # Add the total price and formated_summ to the data_dict
 data_dict['formattedTotalPrice'] = formatted_total_price
 data_dict["TOTALSUMM"] = '{:,.2f}'.format(data_dict['summ'])
-
-print(data_dict)

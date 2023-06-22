@@ -3,88 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="styles.css">
     <title>Receipt</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        .receipt {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-
-        .companyInfo {
-            text-align: center;
-            margin-bottom: 20px;            
-        }
-
-        h2 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .receiptItems td {
-            padding: 100px 0;
-            margin-right: 5px;
-        }
-
-        .line_top {
-            border-top: 0.5px dashed;
-            margin-bottom: 1px;
-        }
-
-        .line_bottom {
-            border-bottom: 0.5px dashed;
-            margin-top: 1px;
-        }
-
-        .summ {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-        .tax table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        .tax th,
-        .tax td {
-            text-align: center;
-            padding: 5px;
-        }
-
-        .tax th {
-            background-color: #f5f5f5;
-            font-weight: bold;
-        }
-
-        .totalSumm {
-            font-weight: bold;
-            text-align: right;
-            margin-bottom: 20px;
-        }
-
-        .payment {
-            margin-bottom: 20px;
-        }
-
-        .Thanks {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .tse {
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
 <body>
     <div class="receipt">
@@ -110,15 +30,23 @@
         </conteiner>
         <hr>
         <conteiner class="receiptItems">
-            {% for item_key, item_data in consolidatedItems.items() %}
-            <div>
+            <table>
                 <tr>
-                    <td>{{ item_data.count }}x {{ item_key }}</td>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>            
+                {% for item_key, item_data in consolidatedItems.items() %}
+                <tr>
+                    <td>{{ item_data.count }}x </td>
+                    <td>{{ item_data.name }}</td>
                     <td>{{ item_data.formatted_price }}</td>
                     <td>{{ item_data.formatted_last_price }}</td>
                 </tr>
-            </div>
-            {% endfor %}
+                {% endfor %}
+            </table>
+            
         </conteiner>
         <hr>
         <conteiner class="summ">    

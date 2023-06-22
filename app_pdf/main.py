@@ -1,5 +1,5 @@
 from get_api import data_dict
-from create import save_rendered_html, generate_rendered_html, render_template
+from render_template import save_rendered_html, generate_rendered_html, render_template
 from settings import create_default_readme_file, create_settings_env_file
 
 def main():
