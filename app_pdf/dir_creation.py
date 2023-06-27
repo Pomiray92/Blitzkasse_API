@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -18,9 +19,8 @@ def create_default_readme_file():
             file.write("---------------------------------------\n")
             file.write("APP for creating pdf from retrieve receipt Information:\n")
             file.write("\n")
-            file.write("This app allows you to create a PDF from retrieve receipt data, store it or send via email.\n")
+            file.write(
+                "This app allows you to create a PDF from retrieve receipt data, store it or send via email.\n"
+            )
             file.write(".\n")
             file.write("\n")
-
-
-
