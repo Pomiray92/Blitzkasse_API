@@ -1,18 +1,12 @@
 import requests
-from get_api import *
-from dir_creation import *
 from datetime import datetime, timedelta
-import pdb
+import os
 
 # CONSTANT VARIABLES
 DEFAULT_SERVER_IP = "localhost"
 SERVER_IP = os.getenv("SERVER_IP", DEFAULT_SERVER_IP)
 LAST_RECEIPT_URL = f"http://{SERVER_IP}:8001/getLastReceipt"
 TIMESTAMP = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
-CURRENT_DATETIME = datetime.now()
-YEAR = CURRENT_DATETIME.year
-MONTH = CURRENT_DATETIME.strftime("%B")
-DAY = CURRENT_DATETIME.day
 CLIENT_INFO_URL = f"http://{SERVER_IP}:8001/ConfigComplete"
 
 
@@ -50,33 +44,22 @@ client_data = get_client_info()
 receipt_items = receipt_data.get("receiptItems", [])
 taxProducts = receipt_data.get("taxProducts")
 
-receipt_items = receipt_data.get("receiptItems", [])
-secure_element_start_time = receipt_data.get(
-    "secureElementStartTime"
-)  # Convert to string
-secure_element_end_time = receipt_data.get("secureElementEndTime")
+secure_element_start_time = receipt_data.get("secureElementStartTime", "0")
+secure_element_end_time = receipt_data.get("secureElementEndTime", "0")
+
 start_timestamp = datetime.strptime(TIMESTAMP, "%d.%m.%Y %H:%M:%S")
-
-if secure_element_start_time in ["0", 0]:
-    secure_element_start_time = datetime.now()
-else:
-    secure_element_start_time = datetime.strptime(
-        secure_element_start_time, "%d.%m.%Y %H:%M:%S"
-    )
-
-if secure_element_end_time in ["0", 0]:
-    secure_element_end_time = start_timestamp + timedelta(seconds=2)
-else:
-    secure_element_end_time = datetime.strptime(
-        secure_element_end_time, "%d.%m.%Y %H:%M:%S"
-    )
-
+secure_element_start_time = (
+    datetime.now() if secure_element_start_time in ["0", 0] else datetime.strptime(secure_element_start_time, "%d.%m.%Y %H:%M:%S")
+)
+secure_element_end_time = (
+    start_timestamp + timedelta(seconds=2) if secure_element_end_time in ["0", 0] else datetime.strptime(secure_element_end_time, "%d.%m.%Y %H:%M:%S")
+)
 
 data_dict = {
     "secureElementStartTime": secure_element_start_time,
     "secureElementEndTime": secure_element_end_time,
     "CUSTOMERNAME": client_data.get("companyName"),
-    "CUSTOMERSTREET": client_data.get("companyAdress"),
+    "CUSTOMERSTREET": client_data.get("companyAddress"),
     "CUSTOMERCITY": client_data.get("companyCity"),
     "companyTaxId": client_data.get("companyTaxId"),
     "CUSTOMEREMAIL": client_data.get("companyEmail"),
@@ -103,8 +86,6 @@ data_dict = {
 
 consolidated_items = {}
 
-consolidated_items = {}
-
 for item in data_dict["receiptItems"]:
     item_id = item["productId"]
     item_name = item["name"]
@@ -122,16 +103,6 @@ for item in data_dict["receiptItems"]:
             "name": item_name,
         }
 
-# Display the consolidated items
-for item_id, item_data in consolidated_items.items():
-    item_name = item_data["name"]
-    item_count = item_data["count"]
-    item_total_price = item_data["price"]
-    item_price = item_total_price / item_count
-
-# Update the data_dict with consolidated items
-data_dict["consolidatedItems"] = consolidated_items
-# breakpoint()
 # Format the prices with commas and two decimal places for each item
 for item_data in consolidated_items.values():
     item_data["formatted_price"] = "{:,.2f}".format(
@@ -145,7 +116,7 @@ total_price = sum(item_data["price"] for item_data in consolidated_items.values(
 # Format the total price with commas and two decimal places
 formatted_total_price = "{:,.2f}".format(total_price)
 
-
-# Add the total price and formated_summ to the data_dict
+# Add the total price, formatted_summ and consolidated_items to the data_dict
 data_dict["formattedTotalPrice"] = formatted_total_price
 data_dict["TOTALSUMM"] = "{:,.2f}".format(data_dict["summ"])
+data_dict["consolidated_items"] = consolidated_items
