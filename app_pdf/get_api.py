@@ -1,6 +1,6 @@
 import requests
 from get_api import *
-from settings import *
+from dir_creation import *
 from datetime import datetime, timedelta
 import pdb
 

@@ -1,8 +1,8 @@
-import os
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
 
 def create_settings_env_file():
     DEFAULT_SERVER_IP = "localhost"
@@ -21,3 +21,6 @@ def create_default_readme_file():
             file.write("This app allows you to create a PDF from retrieve receipt data, store it or send via email.\n")
             file.write(".\n")
             file.write("\n")
+
+
+
