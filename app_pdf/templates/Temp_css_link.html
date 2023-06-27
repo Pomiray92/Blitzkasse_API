@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Receipt</title>
+</head>
+<body>
+    <div class="receipt">
+        <conteiner  class="companyInfo">
+            <tr>
+                <td>
+                    <div>
+                        <p>
+                            {{ CUSTOMERNAME }}<br>
+                            {{ CUSTOMERSTREET }}<br>            
+                            {{ CUSTOMERCITY }}<br>
+                            {{ CUSTOMERNUMBER }}<br>
+                            {{ companyTaxId }}<br>
+                            {{ CUSTOMEREMAIL }}<br>
+                        </p>
+                        <h2>Rechnung {{ BONNUMBER }}</h2>
+                        <p>
+                            Tisch: {{ TABLENUMBER }}<br>
+                        </p>
+                    </div>
+                </td>
+            </tr>
+        </conteiner>
+        <hr>
+        <conteiner class="receiptItems">
+            <table>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>            
+                {% for item_key, item_data in consolidatedItems.items() %}
+                <tr>
+                    <td>{{ item_data.count }}x </td>
+                    <td>{{ item_data.name }}</td>
+                    <td>{{ item_data.formatted_price }}</td>
+                    <td>{{ item_data.formatted_last_price }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            
+        </conteiner>
+        <hr>
+        <conteiner class="summ">    
+            <tr>
+                <td>
+                    <div>
+                        ZWISCHENSUMME: {{ TOTALSUMM }}
+                    </div>
+                </td>
+            </tr>
+        </conteiner>
+        <hr class="line_top">
+        <hr class="line_bottom">
+        <conteiner  class="tax">
+            <table>
+                <tr>
+                    <th>Mwst.</th>
+                    <th>Brutto</th>
+                    <th>Netto</th>
+                    <th>Steuer</th>
+                </tr>
+                {% for taxProduct in taxProducts %}
+                {% if taxProduct.totalBrutto or taxProduct.totalNetto or taxProduct.totalAbsoluteTax %}
+                <tr>
+                    <td>{{ taxProduct.taxValue }}%</td>
+                    <td>{{ '{:,.2f}'.format(taxProduct.totalBrutto) }}</td>
+                    <td>{{ '{:,.2f}'.format(taxProduct.totalNetto) }}</td>
+                    <td>{{ '{:,.2f}'.format(taxProduct.totalAbsoluteTax) }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </table>
+        </conteiner>
+        <hr>
+        <conteiner class="totalSumm">
+            <tr>
+                <td>
+                    <div>
+                        GESAMT : {{ TOTALSUMM }}
+                    </div>
+                </td>
+            </tr>
+        </conteiner>
+        <hr class="line_top">
+        <hr class="line_bottom">
+        <conteiner class="payment">
+            <tr>
+                <td>
+                    <div>
+                        <p> 
+                            {% if PAYMENTTYPE == "Cash"%} Zahlart: BAR {% endif %}<br>
+                            Gezahlt: {{ GIVEMONEY }}<br>
+                            Ruckgabe: {{ BACKMONEY }}<br>
+                            Datum: {{ DATE }}<br>
+                            Kasse: {{ DEVICEID }}<br><br>                
+                            Es bedint Sie: {{USERNAME }}
+                        </p>
+                    </div>
+                </td>
+            </tr>
+        </conteiner>
+        <conteiner class="Thanks">
+            <h3> Vielen Dank! </h3>
+        </conteiner>
+        <conteiner class="tse">
+            <tr>
+                <td>
+                    <div>
+                        <p>
+                            TSE Signatur: {{ receiptsSignature }}<br>
+                            TSE Start: {{ secureElementStartTime }}<br>
+                            TSE Stop: {{ secureElementEndTime }}<br>
+                            TSE Serialnummer: {{ secureElementSerial }}<br>
+                            TSE Transaktion: {{ transactionData }}<br>
+                            TSE Signaturaccount: {{ secureElementClient }}<br>
+                            TSE Zeitformat: {{ secureElementLogTime }}<br>
+                            TSE HashAlgorithm: {{ secureElementAlgorithm }}<br>
+                            TSE PyblicKay: {{ secureElementPublicKey }}<br>
+                        </p>
+                    </div>
+                </td>
+            </tr>
+        </conteiner>
+    </div>
+</body>
+</html>
