@@ -1,6 +1,0 @@
----------------------------------------
-1 print(s): Successful
-Successful printed Receipt #39 at: (2023-06-27 15:00:24)
----------------------------------------
-1 print(s): Successful
-Successful printed Receipt #39 at: (2023-06-27 15:32:16)

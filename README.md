@@ -1,21 +1,88 @@
-# Blitzkasse_API
+# "ReprintReceiptApp"
 
-* Overall, the app retrieves the last receipt information from a specific endpoint, generates a PDF receipt using the retrieved data, and saves the PDF in a directory structure based on the year, month, and day.
+## Übersicht 
+Diese App ermöglicht es Ihnen, den Druckprozess auszulösen, indem Sie den letzten Beleg erneut drucken. Sie bietet die Möglichkeit, die Anzahl der Drucke über Befehlszeilenargumente oder die .env-Datei anzugeben.
 
-* The app performs the following tasks:
+## Voraussetzungen
+Bevor Sie die App verwenden, stellen Sie sicher, dass Sie die folgenden Voraussetzungen erfüllen:
 
-    -  Imports necessary modules such as FPDF for PDF generation, requests for making HTTP requests, and datetime for handling date and time.
+- Python ist auf Ihrem System installiert.
+- Die erforderlichen Pakete sind installiert. Sie können die erforderlichen Pakete mit folgendem Befehl installieren:
 
-    -  Defines a function named get_last_receipt that sends an HTTP GET request to localhost:8001/getLastReceipt to retrieve the last receipt information. It handles potential errors and returns the receipt information in JSON format.
+pip install requirements.txt
 
-    -  Defines a function named create_pdf that generates a PDF receipt using the receipt information obtained from get_last_receipt.
+## Erste Schritte
+Um die App zu verwenden, befolgen Sie diese Schritte:
 
-    - Within create_pdf, it gets the current date and time using datetime.now() and extracts the year, month, and day.
-    - It creates a new FPDF instance and adds a page to it.
-    - It sets the font and adds a header to the PDF.
-    - It iterates over the receipt data, adding key-value pairs to the PDF.
-    - It defines a directory path for storing the PDF based on the current working directory, including a "data" folder and subfolders for year, month, and day.
-    - It checks if the directory path exists and creates it if it doesn't.
-    - It saves the PDF file with a filename based on the current datetime and stores it in the appropriate directory.
-    - It prints a success message if the PDF is created successfully, or an error message if there was a problem retrieving the receipt information.
-    - Calls the create_pdf function to generate the PDF receipt.
+1. Laden Sie den Code herunter oder kopieren Sie ihn in eine Python-Datei (z. B. print_app.py).
+
+2. Öffnen Sie ein Terminal oder die Eingabeaufforderung und navigieren Sie zum Verzeichnis, das die Python-Datei enthält.
+
+3. Führen Sie die Python-Datei mit folgendem Befehl aus:
+
+python print_app.py [num_prints]
+* Ersetzen Sie [num_prints] durch die gewünschte Anzahl der Wiederholungen des letzten Belegs. Dieses Argument ist optional. Wenn es nicht angegeben wird, verwendet die App den Wert aus der .env-Datei oder den Standardwert.
+
+4. Die App löst den Druckprozess aus und liefert Informationen über den Erfolg oder Misserfolg jeder Druckoperation.
+
+## Konfiguration
+Die App unterstützt die Konfiguration über die folgenden Methoden:
+
+### Umgebungsvariablen
+Die App verwendet Umgebungsvariablen zur Konfiguration. Sie können die folgenden Umgebungsvariablen festlegen:
+
+- SERVER_IP: Gibt die IP-Adresse des Servers an. Wenn nicht festgelegt, verwendet die App den Standardwert "localhost".
+- NUM_PRINTS: Gibt die Standardanzahl der Wiederholungen des letzten Belegs an. Wenn nicht festgelegt, verwendet die App den Standardwert.
+### .env-Datei
+Wenn sich die .env-Datei im selben Verzeichnis wie die Python-Datei befindet, lädt die App die Umgebungsvariablen daraus. Wenn die Datei nicht vorhanden ist, wird eine Standard-.env-Datei mit der Standardkonfiguration erstellt.
+
+Um die Konfiguration anzupassen, erstellen oder ändern Sie die .env-Datei mit einem Texteditor. Legen Sie die Umgebungsvariablen im Format SCHLÜSSEL=WERT fest, wobei jede Variable in einer separaten Zeile steht. Beispiel:
+
+- SERVER_IP=192.168.0.1
+- NUM_PRINTS=3
+
+## Ausgabe
+Die App generiert die folgenden Ausgabedateien:
+
+- README.MD: Enthält Informationen über die App und ihre Funktionalität.
+- printing_reports.txt: Speichert einen Protokoll der Druckvorgänge, einschließlich Erfolgs- und Fehlermeldungen für jede Druckoperation.
+
+## Fehlerbehandlung
+Wenn während der Ausführung der App ein Fehler auftritt, werden Fehlermeldungen im Terminal oder in der Eingabeaufforderung angezeigt. Zusätzlich werden detaillierte Fehlerinformationen an die Datei printing_reports.txt angehängt.
+
+## Beispielverwendung
+Hier sind einige Beispiele zur Verwendung der App:
+
+- Drücken Sie den Druckprozess aus und drucken Sie den letzten Beleg einmal erneut:
+
+python print_app.py
+
+- Drücken Sie den Druckprozess aus und drucken Sie den letzten Beleg dreimal erneut:
+
+python print_app.py 3
+
+Anpassung der Standardanzahl der Drucke mit der .env-Datei:
+1. Erstellen Sie eine Datei namens .env im selben Verzeichnis wie die Python-Datei.
+
+2. Öffnen Sie die .env-Datei mit einem Texteditor.
+
+3. Legen Sie die Variable NUM_PRINTS auf den gewünschten Standardwert fest. Beispiel:
+
+### NUM_PRINTS=5
+4. Speichern Sie die Datei.
+
+5. Führen Sie die Python-Datei aus, ohne die Anzahl der Drucke als Befehlszeilenargument anzugeben:
+
+python print_app.py
+
+Die App verwendet den in der .env-Datei angegebenen Standardwert.
+
+## Fazit
+Mit dieser App können Sie den Druckprozess leicht auslösen, indem Sie den letzten Beleg erneut drucken. Sie bietet Flexibilität bei der Angabe der Anzahl der Wiederholungen und unterstützt die Anpassung über Umgebungsvariablen und die .env-Datei.
+
+## Lizenz
+Diese App wird unter den Bedingungen der MIT-Lizenz verteilt. Die MIT-Lizenz ist eine freizügige Open-Source-Lizenz, die es Ihnen ermöglicht, die App zu verwenden, zu modifizieren und zu verteilen, sowohl für kommerzielle als auch für nichtkommerzielle Zwecke. Sie bietet Flexibilität und Freiheit und stellt sicher, dass Sie den ursprünglichen Lizenzhinweis in Kopien oder Derivaten der Software einschließen.
+Durch die Verwendung dieser App stimmen Sie den Bedingungen der MIT-Lizenz zu. Bitte beachten Sie die Datei LICENSE für weitere Informationen.
+## Bibliotheken von Drittanbietern
+Die App kann Drittanbieterbibliotheken oder Abhängigkeiten verwenden, die ihre eigenen Lizenzen haben können. Die Lizenzen für diese Bibliotheken finden Sie in den entsprechenden LICENSE- oder README-Dateien im Quellcode oder in der Dokumentation der Bibliothek. Es ist wichtig, die Lizenzen von Drittanbieterbibliotheken zu überprüfen und einzuhalten, die in Verbindung mit dieser App verwendet werden.
+Hinweis: Die vorherige englische Version des README.md bleibt unverändert, und Sie können beide Versionen in Ihrem Projekt verwenden.

@@ -4,6 +4,7 @@ import argparse
 import os
 from dotenv import load_dotenv
 
+
 DEFAULT_SERVER_IP = "localhost"
 DEFAULT_NUM_PRINTS = 1
 
@@ -22,8 +23,8 @@ TIMESTAMP = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 SERVER_IP = os.getenv("SERVER_IP", DEFAULT_SERVER_IP)
 
 # Check if the README.txt file exists
-if not os.path.isfile("README.txt"):
-    with open("README.txt", "w") as file:
+if not os.path.isfile("README.md"):
+    with open("README.md", "w") as file:
         file.write("---------------------------------------\n")
         file.write("APP for triggering printing process:\n")
         file.write("\n")

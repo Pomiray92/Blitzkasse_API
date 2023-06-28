@@ -14,12 +14,3 @@ def render_template(template_path, data_dict, output_file=None):
 def save_rendered_html(rendered_html, output_file):
     with open(output_file, "w") as file:
         file.write(rendered_html)
-
-
-# def render_template(template_path, data_dict):
-#     env = Environment(loader=FileSystemLoader("."))
-#     template = env.get_template(template_path)
-
-#     # Create a dictionary to store the consolidated items and their quantities
-#     rendered_html = template.render(data_dict)
-#     return rendered_html
