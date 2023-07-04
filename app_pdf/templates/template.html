@@ -8,6 +8,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+    
             
         }
 
@@ -155,7 +156,7 @@
         <conteiner  class="tax">
             <table>
                 <tr>
-                    <th>Mwst.</th>
+                    <th>MwSt. %</th>
                     <th>Brutto</th>
                     <th>Netto</th>
                     <th>Steuer</th>
@@ -190,11 +191,11 @@
                     <div>
                         <p> 
                             {% if PAYMENTTYPE == "Cash"%} Zahlart: BAR {% endif %}<br>
-                            Gezahlt: {{ GIVEMONEY }}<br>
-                            Ruckgabe: {{ BACKMONEY }}<br>
+                            Gezahlt: {{ '{:,.2f}'.format(GIVEMONEY) }} EURO<br>
+                            Ruckgabe: {{ '{:,.2f}'.format(BACKMONEY) }} EURO<br>
                             Datum: {{ DATE }}<br>
                             Kasse: {{ DEVICEID }}<br><br>                
-                            Es bedint Sie: {{USERNAME }}
+                            Es bedint Sie: {{ USERNAME }}
                         </p>
                     </div>
                 </td>
