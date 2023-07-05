@@ -2,6 +2,7 @@ import pdfkit
 from datetime import datetime
 from get_api import data_dict
 import os
+import json
 
 def convert_to_pdf():
     current_datetime = datetime.now()
@@ -22,3 +23,30 @@ def convert_to_pdf():
     file_path = os.path.join(directory_path, f"receipt_N{receipt_number}_{timestamp}.pdf")
 
     pdfkit.from_file(html_file, file_path, configuration=config)
+
+    # Get the relative path
+    relative_path = os.path.relpath(file_path, start=os.getcwd())
+
+    # Create a dictionary with the receipt number and relative file path
+    log_data = {
+        f"Receipt_N{receipt_number}": relative_path,
+    }
+
+    # Update the log file with the dictionary data
+    log_file_path = os.path.join(os.getcwd(), "log.json")
+
+    # Check if the log file exists
+    if os.path.exists(log_file_path):
+        with open(log_file_path, "r") as log_file:
+            existing_data = json.load(log_file)
+
+        # Update the existing data with the new entry
+        existing_data.update(log_data)
+
+        with open(log_file_path, "w") as log_file:
+            json.dump(existing_data, log_file, indent=4)
+    else:
+        with open(log_file_path, "w") as log_file:
+            json.dump(log_data, log_file, indent=4)
+
+
