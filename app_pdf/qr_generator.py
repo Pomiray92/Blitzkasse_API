@@ -1,38 +1,47 @@
 import qrcode
+from PIL import Image
+import json
+import pdb
 import os
-import requests
-from urllib.parse import urlencode
+from dotenv import load_dotenv
+load_dotenv("ftp_server_settings")
 
-DEFAULT_SERVER_IP = "localhost"
-SERVER_IP = os.getenv("SERVER_IP", DEFAULT_SERVER_IP)
-SERVER_URL = f"http://{SERVER_IP}:8080/getPDF"
+download_url = os.getenv("DOWNLOAD_URL", "https://blitzkasse.de/")
+target_directory = os.getenv("TARGET_DIRECTORY", "download/ftpupload")
+#breakpoint()
+def qr_generator():
+    # Load the file paths from the JSON file
+    with open("log.json", "r") as json_file:
+        file_paths = json.load(json_file)
 
-def put_pdf_to_server():
-    try:
-        with open("receipt.pdf", "rb") as file:
-            files = {"file": file}
-            response = requests.put(SERVER_URL, files=files)
+    # Get the latest receipt number
+    latest_receipt_number = max(file_paths.keys())
 
-            if response.status_code == 200:
-                print("PDF file successfully posted to the server.")
-            else:
-                print(f"Error: {response.status_code} - {response.reason}")
-    except IOError as e:
-        print(f"Error: Failed to open the PDF file - {e}")
-    except requests.exceptions.RequestException as e:
-        print(f"Error: Failed to connect to the server - {e}")
+    # Get the file path for the latest receipt number
+    file_path = file_paths[latest_receipt_number]
 
-put_pdf_to_server()
+    # Complete file name and path
+    file_name = f"{latest_receipt_number}.pdf"
+    
+    file_path = target_directory + '/' + os.path.basename(file_paths[latest_receipt_number])
 
-# Create the download URL
-download_url = SERVER_URL
+    # Download URL
+    download_path = download_url + file_path
+    
+    # Generate the QR code
+    qr = qrcode.QRCode()
+    qr.add_data(download_path)
+    qr.make()
 
-# Create the QR code
-qr = qrcode.QRCode(version=1, box_size=10, border=4)
-qr.add_data(download_url)
-qr.make(fit=True)
-qr_img = qr.make_image(fill_color="black", back_color="white")
+    # Create an image from the QR code
+    qr_image = qr.make_image()
 
-# Save or display the QR code image
-qr_img.save("qr_code.png")
-qr_img.show()
+    # Save the QR code image
+    if not os.path.exists("png_receipts"):
+        os.makedirs("png_receipts")
+    qr_image.save(f"png_receipts/{file_name}.png")
+
+    # Open the QR code image
+    img = Image.open(f"png_receipts/{file_name}.png")
+    img.show()
+
