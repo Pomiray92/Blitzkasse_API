@@ -32,7 +32,7 @@ def qr_generator():
     qr = qrcode.QRCode()
     qr.add_data(download_path)
     qr.make()
-
+    breakpoint()
     # Create an image from the QR code
     qr_image = qr.make_image()
 
@@ -45,3 +45,7 @@ def qr_generator():
     img = Image.open(f"png_receipts/{file_name}.png")
     img.show()
 
+
+    print("delau wid chto rabotau")
+
+qr_generator()
