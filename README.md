@@ -1,5 +1,5 @@
 # Overview "app_pdf"
-* The PDF Receipt Generator is a simple application designed to retrieve receipt information and generate PDF documents based on the retrieved data. It offers a convenient way to store or send digital receipts in a standardized and professional format.
+* The PDF Receipt Generator is a application designed to retrieve receipt information thrue API, generate PDF from Template, upload the PDF to FTP and creating a qr_code to esely Downlad the PDF, documents based on the retrieved data. It offers a convenient way to store or send digital receipts in a standardized and professional format.
 
 ## Purpose
 * The app aims to streamline the process of creating PDF receipts by automating the retrieval of receipt data from a server and converting it into a well-formatted PDF document. It eliminates the need for manual entry or formatting of receipt information, saving time and ensuring consistency.
