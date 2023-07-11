@@ -10,8 +10,9 @@ def main(template_path, rendered_html):
     create_settings_env_file()
     save_rendered_html(rendered_html, "templates/rendered_template.html")
     convert_to_pdf()
-    read_from_json_and_upload()
     qr_generator()
+    read_from_json_and_upload()
+    
 
 if __name__ == "__main__":
     template_path = "templates/template.html"

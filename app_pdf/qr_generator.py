@@ -32,7 +32,7 @@ def qr_generator():
     qr = qrcode.QRCode()
     qr.add_data(download_path)
     qr.make()
-    breakpoint()
+    #breakpoint()
     # Create an image from the QR code
     qr_image = qr.make_image()
 
@@ -46,6 +46,4 @@ def qr_generator():
     img.show()
 
 
-    print("delau wid chto rabotau")
-
-qr_generator()
+    #print("delau wid chto rabotau")

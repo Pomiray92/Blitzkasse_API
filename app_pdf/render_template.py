@@ -1,5 +1,4 @@
 from jinja2 import Environment, FileSystemLoader
-from get_api import taxProducts
 from get_api import data_dict
 
 template_path = "templates/template.html"
