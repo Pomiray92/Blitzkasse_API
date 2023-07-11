@@ -10,3 +10,4 @@ data/
 png_receipts/
 settings.env
 ftp_server_settings.env
+upload_all_to_ftp

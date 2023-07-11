@@ -3,6 +3,7 @@ import ssl
 import json
 import os
 from dotenv import load_dotenv
+import pdb
 
 load_dotenv("settings.env")
 
@@ -39,30 +40,29 @@ def preparing_to_upload_ftp(file_path, ftp_host, ftp_user, ftp_password):
         print(f"Error uploading file '{filename}': {str(e)}")
 
 
-def get_uploaded_file_list(ftp, target_directory):
-    # Get the list of files in the target directory
-    ftp.cwd(target_directory)
-    file_list = ftp.nlst()
-    ftp.cwd('/')  # Return to the root directory
-    return file_list
+def get_missing_files(upload_report):
+    missing_files = []
+    for receipt_number, status in upload_report.items():
+        if status == "Not Uploaded":
+            file_name = f"{receipt_number}.pdf"
+            file_path = os.path.join("data", "pdf_rechnungs", file_name)
+            missing_files.append(file_path)
+    return missing_files
 
 
-def mark_file_as_uploaded(ftp, target_directory, filename):
-    # Create a marker file in the target directory to indicate that the file has been uploaded
-    marker_filename = f"{filename}.uploaded"
-    ftp.storbinary(f'STOR {target_directory}/{marker_filename}', open(os.devnull, 'rb'))
+def upload_missing_files():
+    # Load the upload report from the file
+    with open("upload_report.txt", "r") as report_file:
+        upload_report = json.load(report_file)
+
+    # Get the list of missing files
+    missing_files = get_missing_files(upload_report)
+
+    # Upload the missing files
+    for file_path in missing_files:
+        filename = os.path.basename(file_path)
+        print(f"Uploading missing file '{filename}'")
+        preparing_to_upload_ftp(file_path, ftp_host, ftp_user, ftp_password)
 
 
-def read_from_json_and_upload():
-    # Load the file paths from the JSON file
-    with open("log.json", "r") as json_file:
-        file_paths = json.load(json_file)
-
-    # Get the last file path
-    last_file_path = list(file_paths.values())[-1]
-
-    # Upload the last file
-    filename = os.path.basename(last_file_path)
-    print(f"Uploading file '{filename}'")
-    preparing_to_upload_ftp(last_file_path, ftp_host, ftp_user, ftp_password)
-
+upload_missing_files()

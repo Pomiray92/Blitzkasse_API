@@ -4,7 +4,7 @@ import json
 import pdb
 import os
 from dotenv import load_dotenv
-load_dotenv("ftp_server_settings")
+load_dotenv("settings.env")
 
 download_url = os.getenv("DOWNLOAD_URL", "https://blitzkasse.de/")
 target_directory = os.getenv("TARGET_DIRECTORY", "download/ftpupload")
@@ -44,6 +44,3 @@ def qr_generator():
     # Open the QR code image
     img = Image.open(f"png_receipts/{file_name}.png")
     img.show()
-
-
-    #print("delau wid chto rabotau")
