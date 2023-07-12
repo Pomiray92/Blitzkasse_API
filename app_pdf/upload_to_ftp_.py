@@ -3,13 +3,14 @@ import ssl
 import json
 import os
 from dotenv import load_dotenv
+from get_api import data_dict
 
 load_dotenv("settings.env")
 
 ftp_host = os.getenv("FTP_HOST")
 ftp_user = os.getenv("FTP_USER")
 ftp_password = os.getenv("FTP_PASSWORD")
-
+receipt_number = data_dict["BONNUMBER"]
 
 def preparing_to_upload_ftp(file_path, ftp_host, ftp_user, ftp_password):
     try:
@@ -25,18 +26,39 @@ def preparing_to_upload_ftp(file_path, ftp_host, ftp_user, ftp_password):
 
         # Extract the file name from the file path
         filename = os.path.basename(file_path)
-
+        
         # Open the local file in binary mode for reading
         with open(file_path, 'rb') as file:
             # Upload the file to the FTP server in the target directory
             ftp.storbinary(f'STOR {target_directory}/{filename}', file)
 
-        print(f"File '{filename}' uploaded successfully.")
+        #print(f"File '{filename}' uploaded successfully.")
+        def upload_report():
+            log_data = {
+                f"Receipt_N{receipt_number}": 'successful uploaded',
+            }
+
+            upload_log_file_path = os.path.join(os.getcwd(), "logs/upload_log.json")
+
+            # Check if the log file exists
+            if os.path.exists(upload_log_file_path):
+                with open(upload_log_file_path, "r") as log_file:
+                    existing_data = json.load(log_file)
+
+                # Update the existing data with the new entry
+                existing_data.update(log_data)
+                with open(upload_log_file_path, "w") as log_file:
+                    json.dump(existing_data, log_file, indent=4)
+            else:
+                with open(upload_log_file_path, "w") as log_file:
+                    json.dump(log_data, log_file, indent=4)
+        upload_report()
 
         ftp.quit()  # Send the QUIT command to the server and close the connection
     except Exception as e:
         filename = os.path.basename(file_path)  # Assign a default value to filename
         print(f"Error uploading file '{filename}': {str(e)}")
+
 
 
 def get_uploaded_file_list(ftp, target_directory):
@@ -55,7 +77,7 @@ def mark_file_as_uploaded(ftp, target_directory, filename):
 
 def read_from_json_and_upload():
     # Load the file paths from the JSON file
-    with open("log.json", "r") as json_file:
+    with open("logs/pdf_creation_log.json", "r") as json_file:
         file_paths = json.load(json_file)
 
     # Get the last file path

@@ -11,7 +11,7 @@ target_directory = os.getenv("TARGET_DIRECTORY", "download/ftpupload")
 #breakpoint()
 def qr_generator():
     # Load the file paths from the JSON file
-    with open("log.json", "r") as json_file:
+    with open("pdf_creation_log.json", "r") as json_file:
         file_paths = json.load(json_file)
 
     # Get the latest receipt number

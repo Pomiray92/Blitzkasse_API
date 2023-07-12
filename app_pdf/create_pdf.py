@@ -33,7 +33,7 @@ def convert_to_pdf():
     }
 
     # Update the log file with the dictionary data
-    log_file_path = os.path.join(os.getcwd(), "log.json")
+    log_file_path = os.path.join(os.getcwd(), "pdf_creation_log.json")
 
     # Check if the log file exists
     if os.path.exists(log_file_path):

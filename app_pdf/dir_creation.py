@@ -14,6 +14,7 @@ def create_settings_env_file():
             env_file.write(f"SERVER_IP={DEFAULT_SERVER_IP}\n")
 
 
+
 def create_default_readme_file():
     readme_file = "README.md"
 
