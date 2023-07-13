@@ -7,11 +7,12 @@ from dotenv import load_dotenv
 load_dotenv("settings.env")
 
 download_url = os.getenv("DOWNLOAD_URL", "https://blitzkasse.de/")
-target_directory = os.getenv("TARGET_DIRECTORY", "download/ftpupload")
+target_directory = os.getenv("TARGET_DONWLOAD_DIR", "download/ftpupload")
+
 #breakpoint()
 def qr_generator():
     # Load the file paths from the JSON file
-    with open("pdf_creation_log.json", "r") as json_file:
+    with open("logs/pdf_creation_log.json", "r") as json_file:
         file_paths = json.load(json_file)
 
     # Get the latest receipt number

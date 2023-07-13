@@ -4,6 +4,7 @@ import json
 import os
 from dotenv import load_dotenv
 from get_api import data_dict
+import pdb
 
 load_dotenv("settings.env")
 
@@ -11,6 +12,7 @@ ftp_host = os.getenv("FTP_HOST")
 ftp_user = os.getenv("FTP_USER")
 ftp_password = os.getenv("FTP_PASSWORD")
 receipt_number = data_dict["BONNUMBER"]
+target_dir = os.getenv("TARGET_UPLOAD_DIRECTORY")
 
 def preparing_to_upload_ftp(file_path, ftp_host, ftp_user, ftp_password):
     try:
@@ -21,16 +23,13 @@ def preparing_to_upload_ftp(file_path, ftp_host, ftp_user, ftp_password):
         # Enable SSL/TLS for the data channel
         ftp.prot_p()
 
-        # Set the target directory on the FTP server
-        target_directory = "public_html/blitzkasse.de/download/ftpupload"
-
         # Extract the file name from the file path
         filename = os.path.basename(file_path)
         
         # Open the local file in binary mode for reading
         with open(file_path, 'rb') as file:
             # Upload the file to the FTP server in the target directory
-            ftp.storbinary(f'STOR {target_directory}/{filename}', file)
+            ftp.storbinary(f'STOR {target_dir}/{filename}', file)
 
         #print(f"File '{filename}' uploaded successfully.")
         def upload_report():
@@ -57,7 +56,7 @@ def preparing_to_upload_ftp(file_path, ftp_host, ftp_user, ftp_password):
         ftp.quit()  # Send the QUIT command to the server and close the connection
     except Exception as e:
         filename = os.path.basename(file_path)  # Assign a default value to filename
-        print(f"Error uploading file '{filename}': {str(e)}")
+        print(f"Connection Error: '{filename}' can not be uploaded: {str(e)}")
 
 
 
@@ -82,9 +81,8 @@ def read_from_json_and_upload():
 
     # Get the last file path
     last_file_path = list(file_paths.values())[-1]
-
+    #breakpoint()
     # Upload the last file
     filename = os.path.basename(last_file_path)
-    print(f"Uploading file '{filename}'")
+    # print(f"Uploading file '{filename}'")
     preparing_to_upload_ftp(last_file_path, ftp_host, ftp_user, ftp_password)
-

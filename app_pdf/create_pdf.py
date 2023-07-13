@@ -3,6 +3,8 @@ from datetime import datetime
 from get_api import data_dict
 import os
 import json
+import secrets
+token = secrets.token_urlsafe(16)
 
 def convert_to_pdf():
     current_datetime = datetime.now()
@@ -20,7 +22,7 @@ def convert_to_pdf():
     os.makedirs(directory_path, exist_ok=True)
 
     # Save the PDF file with the current datetime in the filename and store it in the year folder
-    file_path = os.path.join(directory_path, f"receipt_N{receipt_number}_{timestamp}.pdf")
+    file_path = os.path.join(directory_path, f"receipt_N{receipt_number}_{timestamp}token{token}.pdf")
 
     pdfkit.from_file(html_file, file_path, configuration=config)
 
@@ -33,7 +35,7 @@ def convert_to_pdf():
     }
 
     # Update the log file with the dictionary data
-    log_file_path = os.path.join(os.getcwd(), "pdf_creation_log.json")
+    log_file_path = os.path.join(os.getcwd(), "logs/pdf_creation_log.json")
 
     # Check if the log file exists
     if os.path.exists(log_file_path):
